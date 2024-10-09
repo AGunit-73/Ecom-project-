@@ -18,6 +18,10 @@ export default function LandingPage() {
     router.push('/pages/login');
   };
 
+  const handleFashionClick = () => {
+    router.push('/pages/fashion');
+  };
+
   useEffect(() => {
     // Dynamically load the Pacifico font from Google Fonts
     const link = document.createElement('link');
@@ -31,9 +35,13 @@ export default function LandingPage() {
       {/* Black Top Bar */}
       <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-4 bg-black z-10">
         <nav className="flex-1 flex justify-center space-x-8">
-          <a href="#fashion" className="text-white hover:text-gray-300 transition" style={pacificoFont}>
+          <button
+            onClick={handleFashionClick}
+            className="text-white hover:text-gray-300 transition"
+            style={pacificoFont}
+          >
             Fashion
-          </a>
+          </button>
           <a href="#travel" className="text-white hover:text-gray-300 transition" style={pacificoFont}>
             Travel
           </a>
