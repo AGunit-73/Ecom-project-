@@ -1,7 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
-export async function GET(request) {
+export async function GET() {
   try {
     // SQL statement to create the 'items' table
     await sql`
