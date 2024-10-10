@@ -1,10 +1,10 @@
-import ApiService from "@/app/api_service/index";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import ApiService from '@/app/api_service/index';
 
 export async function POST(request: Request) {
   try {
     const { usernameOrEmail, password } = await request.json();
-    console.log("Received login data:", { usernameOrEmail, password });
+    console.log('Received login data:', { usernameOrEmail, password });
 
     const result = await ApiService.authenticateUser(usernameOrEmail, password);
 
@@ -20,9 +20,9 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    console.error("Error during login:", error);
+    console.error('Error during login:', error);
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
+      { success: false, message: 'Internal server error' },
       { status: 500 }
     );
   }
