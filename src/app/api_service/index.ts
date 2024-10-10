@@ -28,8 +28,6 @@ export default class ApiService {
       const encryptedEmail = encryptEmail(email);
       const hashedPassword = await hashPassword(password);
 
-      console.log("Storing encrypted email:", encryptedEmail);
-
       // SQL query to insert the user into the database.
       const result = await sql<User[]>`
         INSERT INTO users (username, email, password)
@@ -37,7 +35,7 @@ export default class ApiService {
         RETURNING id, username, email, password;
       `;
 
-      const user = result[0]; // Access the first user directly from the result.
+      const user = result[0]; // Extract the first user from the result.
 
       return {
         success: true,
@@ -63,22 +61,16 @@ export default class ApiService {
     try {
       const encryptedEmail = encryptEmail(usernameOrEmail);
 
-      console.log("Attempting to authenticate user with:", usernameOrEmail);
-      console.log("Encrypted email:", encryptedEmail);
-
-      // Temporary: Retrieve user by username or plain email.
+      // Retrieve user by username or encrypted email.
       const result = await sql<User[]>`
         SELECT id, username, email, password FROM users
         WHERE username = ${usernameOrEmail} OR email = ${encryptedEmail};
       `;
 
-      console.log("Query result:", result);
-
-      const user = result[0]; // Access the first user directly from the result.
+      const user = result[0]; // Extract the first user from the result.
 
       // Check if a user was found.
       if (!user) {
-        console.log("No user found with the provided username or email.");
         return { success: false, message: "User not found" };
       }
 
