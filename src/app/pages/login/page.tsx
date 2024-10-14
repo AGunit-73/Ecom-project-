@@ -18,23 +18,32 @@ export default function LoginPage() {
   const [signupUsername, setSignupUsername] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+  const [userType, setUserType] = useState("customer"); // For dropdown selection
 
   const handleLogin = async () => {
+    console.log("Attempting login with:", {
+      email: loginUsernameOrEmail,
+      password: loginPassword,
+      userType,
+    });
+
     try {
-      const res = await fetch("/api/user/login", {
+      const endpoint = userType === "vendor" ? "/api/vendor/login" : "/api/customer/login";
+      const res = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          usernameOrEmail: loginUsernameOrEmail,
+          email: loginUsernameOrEmail,
           password: loginPassword,
         }),
       });
+
       const data = await res.json();
+      console.log("Login response:", data);
+
       if (data.success && data.user) {
-        setUser(data.user); // Update the user context
-        router.push("/"); // Redirect to the homepage after login
+        setUser(data.user);
+        router.push("/"); // Redirect to homepage after successful login
       } else {
         alert(data.message || "Login failed");
       }
@@ -45,23 +54,32 @@ export default function LoginPage() {
   };
 
   const handleSignup = async () => {
+    console.log("Attempting signup with:", {
+      name: signupUsername,
+      email: signupEmail,
+      password: signupPassword,
+      userType,
+    });
+
     try {
-      const res = await fetch("/api/user/signup", {
+      const endpoint = userType === "vendor" ? "/api/vendor/add-vendor" : "/api/customer/add-customer";
+      const res = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: signupUsername,
+          name: signupUsername,
           email: signupEmail,
           password: signupPassword,
         }),
       });
+
       const data = await res.json();
+      console.log("Signup response:", data);
+
       if (data.success && data.user) {
-        setUser(data.user); // Update the user context
+        setUser(data.user);
         alert("Signup successful. Please log in.");
-        setIsSignupOpen(false); // Close the signup form
+        setIsSignupOpen(false);
       } else {
         alert(data.message || "Signup failed");
       }
@@ -92,7 +110,6 @@ export default function LoginPage() {
         Isolora
       </button>
 
-      {/* Container for the Content on the Left Side */}
       <div className="w-2/5 flex flex-col justify-center items-center p-8">
         <h1 className="text-4xl font-bold mb-4 text-black">
           Huge market, Free services!
@@ -100,7 +117,15 @@ export default function LoginPage() {
         <p className="text-lg mb-8 text-black">
           Work with vendors across the world
         </p>
-        <form autoComplete="off" name="login-form" className="w-full max-w-sm">
+        <form autoComplete="off" className="w-full max-w-sm">
+          <select
+            value={userType}
+            onChange={(e) => setUserType(e.target.value)}
+            className="mb-4 p-2 border rounded w-full text-black"
+          >
+            <option value="customer">Customer</option>
+            <option value="vendor">Vendor</option>
+          </select>
           <input
             type="text"
             placeholder="Email or Username"
@@ -134,21 +159,26 @@ export default function LoginPage() {
           Sign Up
         </button>
         <p className="mt-8 text-sm text-gray-600">
-          By logging in or signing up, you are officially eligible for Isolora
-          merchant!
+          By logging in or signing up, you are officially eligible for Isolora merchant!
         </p>
       </div>
 
-      {/* Signup Form Modal */}
       {isSignupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded shadow-md w-96">
             <h2 className="text-2xl font-bold mb-4 text-black">Sign Up</h2>
-            <form autoComplete="off" name="signup-form">
+            <form autoComplete="off">
+              <select
+                value={userType}
+                onChange={(e) => setUserType(e.target.value)}
+                className="mb-4 p-2 border rounded w-full text-black"
+              >
+                <option value="customer">Customer</option>
+                <option value="vendor">Vendor</option>
+              </select>
               <input
                 type="text"
                 placeholder="Username"
-                autoComplete="new-username"
                 value={signupUsername}
                 onChange={(e) => setSignupUsername(e.target.value)}
                 className="mb-4 p-2 border rounded w-full text-black"
@@ -156,7 +186,6 @@ export default function LoginPage() {
               <input
                 type="email"
                 placeholder="Email"
-                autoComplete="new-email"
                 value={signupEmail}
                 onChange={(e) => setSignupEmail(e.target.value)}
                 className="mb-4 p-2 border rounded w-full text-black"
@@ -164,7 +193,6 @@ export default function LoginPage() {
               <input
                 type="password"
                 placeholder="Password"
-                autoComplete="new-password"
                 value={signupPassword}
                 onChange={(e) => setSignupPassword(e.target.value)}
                 className="mb-4 p-2 border rounded w-full text-black"
@@ -188,19 +216,13 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Container for the Background Image on the Right Side */}
       <div className="relative w-3/5 h-screen">
-        <div
-          className="relative h-full w-full"
-          style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 15% 100%)" }}
-        >
-          <Image
-            src="/images/background4.webp"
-            alt="Background"
-            fill
-            className="object-cover"
-          />
-        </div>
+        <Image
+          src="/images/background4.webp"
+          alt="Background"
+          fill
+          className="object-cover"
+        />
         <div className="absolute top-[55%] left-[55%] transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-[40px] text-center">
           &quot;One For ALL App! Start NOW!&quot;
         </div>
