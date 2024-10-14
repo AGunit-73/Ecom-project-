@@ -1,32 +1,19 @@
-// src/app/api/user/create_table/route.ts
-import { sql } from "@vercel/postgres";
-import { NextResponse } from "next/server";
+// src/app/api/items/create/route.ts
+import { NextResponse } from 'next/server';
+import ApiService from '@/app/api_service/index';
 
-export async function GET() {
+export async function POST(request: Request) {
   try {
-    // SQL statement to create the 'users' table
-    await sql`
-    CREATE TABLE IF NOT EXISTS items (
-    ItemID SERIAL PRIMARY KEY,
-    VendorID INT,
-    Name VARCHAR(255) NOT NULL,
-    Description TEXT,
-    Price VARCHAR(255) NOT NULL,
-    Category VARCHAR(255),
-    StockQuantity INT DEFAULT 0,
-    CreatedAt TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);`;
+    const { vendorid, name, description, price, category, stockquantity } = await request.json();
+    const result = await ApiService.addItem(vendorid, name, description, price, category, stockquantity);
 
-    console.log("Customer table created successfully");
-    return NextResponse.json(
-      { message: "Customer table created successfully" },
-      { status: 200 }
-    );
+    if (result.success) {
+      return NextResponse.json(result.item, { status: 201 });
+    } else {
+      return NextResponse.json({ error: result.message }, { status: 400 });
+    }
   } catch (error) {
-    console.error('Error creating users table:', error);
-    return NextResponse.json(
-      { error: "Error creating users table" },
-      { status: 500 }
-    );
+    console.error('Error adding item:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

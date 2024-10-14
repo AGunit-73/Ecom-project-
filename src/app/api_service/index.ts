@@ -341,7 +341,7 @@
 
 import { sql } from "@vercel/postgres";
 
-// Define the Vendor and Customer types
+// Define the Vendor, Customer, and Item types
 interface Vendor {
   vendorid?: number;
   name: string;
@@ -360,16 +360,19 @@ interface Customer {
   address?: string;
 }
 
+interface Item {
+  itemid?: number;
+  vendorid: number;
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+  stockquantity: number;
+  createdat?: Date;
+}
+
 export default class ApiService {
-  /**
-   * Registers a new vendor.
-   * @param {string} name - The name of the vendor.
-   * @param {string} email - The email of the vendor.
-   * @param {string} password
-   * @param {string} phone - The phone number of the vendor.
-   * @param {string} address - The address of the vendor.
-   * @returns {Promise<{ success: boolean; message: string; vendor?: Vendor }>}
-   */
+  // Vendor registration
   static async registerVendor(
     name: string,
     email: string,
@@ -377,21 +380,14 @@ export default class ApiService {
     phone?: string,
     address?: string
   ): Promise<{ success: boolean; message: string; vendor?: Vendor }> {
-    phone = phone?.trim() || "missing data";
-    address = address?.trim() || "missing data";
-
-    console.log("Registering vendor with data:", { name, email, phone, address });
-
     try {
       const result = await sql<Vendor[]>`
         INSERT INTO Vendor (name, email, password, phone, address)
-        VALUES (${name}, ${email}, ${password}, ${phone}, ${address})
+        VALUES (${name}, ${email}, ${password}, ${phone ?? null}, ${address ?? null})
         RETURNING vendorid, name, email, password, phone, address;
       `;
 
       const vendor = result.rows[0];
-      console.log("Vendor registered successfully:", vendor);
-
       return {
         success: true,
         message: "Vendor registered successfully",
@@ -403,15 +399,7 @@ export default class ApiService {
     }
   }
 
-  /**
-   * Registers a new customer.
-   * @param {string} name - The name of the customer.
-   * @param {string} email - The email of the customer.
-   * @param {string} password
-   * @param {string} phone - The phone number of the customer.
-   * @param {string} address - The address of the customer.
-   * @returns {Promise<{ success: boolean; message: string; customer?: Customer }>}
-   */
+  // Customer registration
   static async registerCustomer(
     name: string,
     email: string,
@@ -419,21 +407,14 @@ export default class ApiService {
     phone?: string,
     address?: string
   ): Promise<{ success: boolean; message: string; customer?: Customer }> {
-    phone = phone?.trim() || "missing data";
-    address = address?.trim() || "missing data";
-
-    console.log("Registering customer with data:", { name, email, phone, address });
-
     try {
       const result = await sql<Customer[]>`
         INSERT INTO Customer (name, email, password, phone, address)
-        VALUES (${name}, ${email}, ${password}, ${phone}, ${address})
+        VALUES (${name}, ${email}, ${password}, ${phone ?? null}, ${address ?? null})
         RETURNING customerid, name, email, password, phone, address;
       `;
 
       const customer = result.rows[0];
-      console.log("Customer registered successfully:", customer);
-
       return {
         success: true,
         message: "Customer registered successfully",
@@ -445,12 +426,7 @@ export default class ApiService {
     }
   }
 
-   /**
-   * Authenticates a user with their username/email and password.
-   * @param {string} email - The username or email of the user.
-   * @param {string} password - The password of the user.
-   * @returns {Promise<{ success: boolean; message: string; user?: User }>}
-   */
+  // User authentication (for Vendor and Customer)
   static async authenticateUser(
     email: string,
     password: string
@@ -474,12 +450,12 @@ export default class ApiService {
       const user = result.rows[0]; // Either a vendor or customer
       console.log("User found:", user);
 
+      // Note: You should hash the password and compare the hashed value.
       if (user.password !== password) {
         console.log("Password mismatch for user:", email);
         return { success: false, message: "Invalid password" };
       }
 
-      console.log("User authenticated successfully:", user);
       return {
         success: true,
         message: "User authenticated successfully",
@@ -490,5 +466,35 @@ export default class ApiService {
       return { success: false, message: "Error during authentication" };
     }
   }
-}
 
+  // Add item functionality
+  static async addItem(
+    vendorid: number,
+    name: string,
+    description: string,
+    price: string,
+    category: string,
+    stockquantity: number
+  ): Promise<{ success: boolean; message: string; item?: Item }> {
+    console.log("Adding item with data:", { vendorid, name, description, price, category, stockquantity });
+
+    try {
+      const result = await sql<Item[]>`
+        INSERT INTO items (vendorid, name, description, price, category, stockquantity)
+        VALUES (${vendorid}, ${name}, ${description}, ${price}, ${category}, ${stockquantity})
+        RETURNING itemid, vendorid, name, description, price, category, stockquantity, createdat;
+      `;
+
+      const item = result.rows[0];
+      console.log("Item added successfully:", item);
+      return {
+        success: true,
+        message: "Item added successfully",
+        item,
+      };
+    } catch (error) {
+      console.error("Error adding item:", error);
+      return { success: false, message: "Error adding item" };
+    }
+  }
+}
