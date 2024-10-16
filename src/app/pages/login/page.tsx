@@ -37,12 +37,11 @@ export default function LoginPage() {
           password: loginPassword,
         }),
       });
-
       const data = await res.json();
       console.log("Login response:", data);
-
-      if (data.success && data.user) {
-        setUser(data.user);
+      console.log(data.message.user.name);
+      if (data.success) {
+        setUser(data.message.user);
         router.push("/"); // Redirect to homepage after successful login
       } else {
         alert(data.message || "Login failed");

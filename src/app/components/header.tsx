@@ -63,7 +63,7 @@ export default function Header() {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="text-white"
           >
-            Hello, {user.username}
+            <span style={{color:"white"}}>Hello, {user.email}</span>
           </button>
         ) : (
           <button

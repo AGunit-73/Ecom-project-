@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     if (result.success) {
       return NextResponse.json(
-        { success: true, message: result.message },
+        { success: true, message: result },
         { status: 201 }
       );
     } else {

@@ -7,10 +7,10 @@ export async function POST(request: Request) {
     console.log('Received customer registration data:', { email, password});
 
     const result = await ApiService.authenticateUser(email, password);
-
+    
     if (result.success) {
       return NextResponse.json(
-        { success: true, message: result.message },
+        { success: true, message: result,},
         { status: 201 }
       );
     } else {
