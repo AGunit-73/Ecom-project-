@@ -5,7 +5,6 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Image from 'next/image';
-import CartSidebar from '@/app/components/cart_side_bar';
 
 const pacificoFont = {
   fontFamily: 'Pacifico, cursive',
@@ -48,7 +47,6 @@ export default function ShopPage() {
         </div>
 
         {/* Cart Sidebar */}
-        <CartSidebar />
       </header>
 
       {/* Main content of the Shop page */}
