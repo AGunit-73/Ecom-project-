@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import ApiService from '@/app/api_service/index';
 
+//add session token
 export async function POST(request: Request) {
   try {
     const { usernameOrEmail, password } = await request.json();
