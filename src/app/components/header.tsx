@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@/app/context/usercontext";
 
-// Define the Pacifico font style for the header
 const pacificoFont = {
   fontFamily: "Pacifico, cursive",
 };
@@ -14,49 +13,74 @@ export default function Header() {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    setUser(null); // Clear the user context
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/user/logout", {
+        method: "POST",
+      });
+
+      logout(); // Clear the user context
+      setUser(null); // Clear user state
+      router.push("/");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
+
+  useEffect(() => {
+    // This will ensure that the user state is set when the component mounts
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user/me");
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          setUser(data.user); // Set the user in context
+        } else {
+          setUser(null); // Clear the user if no session
+        }
+      } catch (error) {
+        console.error("Error fetching user on page load:", error);
+      }
+    };
+
+    fetchUser(); // Fetch the user when the component mounts
+  }, [setUser]);
 
   return (
     <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-4 bg-black z-10">
-      {/* Logo Button */}
       <button
         onClick={() => router.push("/")}
         className="text-white font-bold"
-        style={{ ...pacificoFont, fontSize: "36px" }} // Increased font size
+        style={{ ...pacificoFont, fontSize: "36px" }}
       >
         Isolora
       </button>
 
-      {/* Navigation Links */}
       <nav className="flex space-x-8">
         <button
           onClick={() => router.push("/pages/fashion")}
           className="text-white hover:text-pink-300 transition"
-          style={{ ...pacificoFont, fontSize: "24px" }} // Increased font size
+          style={{ ...pacificoFont, fontSize: "24px" }}
         >
           Fashion
         </button>
         <button
           onClick={() => router.push("/pages/travel")}
           className="text-white hover:text-pink-300 transition"
-          style={{ ...pacificoFont, fontSize: "24px" }} // Increased font size
+          style={{ ...pacificoFont, fontSize: "24px" }}
         >
           Travel
         </button>
         <button
           onClick={() => router.push("/pages/entertainment")}
           className="text-white hover:text-pink-300 transition"
-          style={{ ...pacificoFont, fontSize: "24px" }} // Increased font size
+          style={{ ...pacificoFont, fontSize: "24px" }}
         >
           Entertainment
         </button>
       </nav>
 
-      {/* User Dropdown or Log In Button */}
       <div className="relative">
         {user ? (
           <button

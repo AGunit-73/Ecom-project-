@@ -10,7 +10,7 @@ const pacificoFont = {
 };
 
 export default function LoginPage() {
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
   const router = useRouter();
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [loginUsernameOrEmail, setLoginUsernameOrEmail] = useState("");
@@ -34,6 +34,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (data.success && data.user) {
         setUser(data.user); // Update the user context
+        document.cookie = `sessionToken=${data.token}; path=/;`; // Save the token in cookies
         router.push("/"); // Redirect to the homepage after login
       } else {
         alert(data.message || "Login failed");
@@ -57,12 +58,18 @@ export default function LoginPage() {
           password: signupPassword,
         }),
       });
+      
       const data = await res.json();
+      
       if (data.success && data.user) {
-        setUser(data.user); // Update the user context
-        alert("Signup successful. Please log in.");
-        setIsSignupOpen(false); // Close the signup form
+        // Set the user in context to log them in immediately after signup
+        setUser(data.user);
+  
+        // Redirect to the homepage
+        router.push("/");
+  
       } else {
+        // Display error message only if registration fails
         alert(data.message || "Signup failed");
       }
     } catch (error) {
@@ -75,11 +82,30 @@ export default function LoginPage() {
     router.push("/");
   };
 
+  // Automatically check for session token on page load
   useEffect(() => {
-    const link = document.createElement("link");
-    link.href = "https://fonts.googleapis.com/css2?family=Pacifico&display=swap";
-    link.rel = "stylesheet";
-    document.head.appendChild(link);
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("sessionToken="))
+      ?.split("=")[1];
+
+    if (token) {
+      // Fetch the current user from /api/user/me using the session token
+      fetch("/api/user/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.user) {
+            setUser(data.user); // Set the user in context
+          }
+        })
+        .catch((error) => {
+          console.error("Error during token verification:", error);
+        });
+    }
   }, []);
 
   return (
