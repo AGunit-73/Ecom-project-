@@ -49,7 +49,7 @@ export default function Header() {
             className="text-white hover:text-pink-300 transition"
             style={{ ...helveticaFont, fontSize: "24px" }} // Increased font size
           >
-            Add Items
+            Vendor
           </button>
         )}
       </nav>
