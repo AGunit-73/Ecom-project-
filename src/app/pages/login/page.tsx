@@ -10,7 +10,7 @@ const pacificoFont = {
 };
 
 export default function LoginPage() {
-  const { user, setUser } = useUser();
+  const { setUser } = useUser(); // No need for `user` if it's not used, only `setUser`
   const router = useRouter();
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [loginUsernameOrEmail, setLoginUsernameOrEmail] = useState("");
@@ -106,7 +106,7 @@ export default function LoginPage() {
           console.error("Error during token verification:", error);
         });
     }
-  }, []);
+  }, [setUser]); // Add `setUser` as a dependency
 
   return (
     <div className="relative bg-white min-h-screen flex">

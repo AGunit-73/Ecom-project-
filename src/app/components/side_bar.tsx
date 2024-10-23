@@ -2,25 +2,30 @@
 
 import { useState, useEffect } from "react";
 import { Slider } from "@mui/material"; // Import slider from Material UI for price range
-import { useRouter } from "next/navigation";
 
 interface Category {
   id: number;
   name: string;
 }
 
-interface SidebarProps {
-  onFilterChange: (filters: any) => void;
+interface Filters {
+  categories: number[];
+  priceRange: number[];
+  condition: string[];
+  sellerUsername: string;
 }
 
-export default function Sidebar({ onFilterChange }: SidebarProps) {
+interface SidebarProps {
+  onFilterChange: (filters: Filters) => void; // Define specific types for the filters
+  currentTab: string; // Include the currentTab prop
+}
+
+export default function Sidebar({ onFilterChange, currentTab }: SidebarProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
   const [condition, setCondition] = useState<string[]>([]);
   const [sellerUsername, setSellerUsername] = useState("");
-
-  const router = useRouter();
 
   // Fetch categories from the API
   useEffect(() => {
@@ -54,17 +59,19 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
 
   // Trigger filter change
   useEffect(() => {
-    const filters = {
+    const filters: Filters = {
       categories: selectedCategories,
       priceRange,
       condition,
       sellerUsername,
     };
     onFilterChange(filters);
-  }, [selectedCategories, priceRange, condition, sellerUsername]);
+  }, [selectedCategories, priceRange, condition, sellerUsername, onFilterChange]); // Add `onFilterChange` to dependencies
 
   return (
-    <div className="w-60 bg-white shadow-lg p-4 fixed left-0 top-10 h-full"> {/* Add 'top-10' for padding */}
+    <div className="w-60 bg-white shadow-lg p-4 fixed left-0 top-10 h-full">
+      <h3 className="font-bold mb-2">Current Tab: {currentTab}</h3> {/* Display current tab */}
+
       {/* Category Filter */}
       <h3 className="font-bold mb-2">Categories</h3>
       {categories.map((category) => (
