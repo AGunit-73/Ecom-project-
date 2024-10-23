@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import Header from "@/app/components/header";
 import Sidebar from "@/app/components/side_bar";
 import Image from "next/image";
-import ApiService from "@/app/api_service/index";
 
 // Import Google Fonts
 const pacificoFont = {
@@ -59,7 +58,7 @@ export default function FashionPage() {
             items.map((item) => (
               <div key={item.id} className="border p-4 rounded-lg">
                 <Image
-                  src={(item.imageUrls && item.imageUrls.length > 0) ? item.imageUrls[0] : "/default-image.jpg"} // Fallback to default image
+                  src={(item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : "/default-image.jpg"} // Fallback to default image
                   alt={item.title}
                   width={300}
                   height={300}

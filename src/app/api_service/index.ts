@@ -144,7 +144,29 @@ export default class ApiService {
       console.error("Error fetching items:", error);
       return { success: false, message: "Error fetching items" };
     }
-  }  
+  }
+
+  static async fetchItemById(id: string): Promise<{ success: boolean; item?: Item; message: string }> {
+  try {
+    const result = await sql<Item[]>`
+      SELECT items.*, categories.name as category_name, users.username as seller_username
+      FROM items
+      JOIN categories ON items.category_id = categories.id
+      JOIN users ON items.seller_id = users.id
+      WHERE items.id = ${id};
+    `;
+
+    if (result.rows.length === 0) {
+      return { success: false, message: "Item not found" };
+    }
+
+    return { success: true, item: result.rows[0], message: "Item fetched successfully" };
+  } catch (error) {
+    console.error("Error fetching item:", error);
+    return { success: false, message: "Error fetching item" };
+  }
+}
+  
   
 
   static async fetchCategories(): Promise<{ success: boolean; categories?: any[]; message: string }> {
