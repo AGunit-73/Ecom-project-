@@ -1,66 +1,133 @@
-// src/app/components/Sidebar.tsx
+"use client";
 
-import React, { useState } from 'react';
+import { useState, useEffect } from "react";
+import { Slider } from "@mui/material"; // Import slider from Material UI for price range
+import { useRouter } from "next/navigation";
 
-const Sidebar = ({ currentTab }) => {
-  const [openDropdown, setOpenDropdown] = useState('');
+interface Category {
+  id: number;
+  name: string;
+}
 
-  const toggleDropdown = (tab) => {
-    setOpenDropdown(openDropdown === tab ? '' : tab);
+interface SidebarProps {
+  onFilterChange: (filters: any) => void;
+}
+
+export default function Sidebar({ onFilterChange }: SidebarProps) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
+  const [condition, setCondition] = useState<string[]>([]);
+  const [sellerUsername, setSellerUsername] = useState("");
+
+  const router = useRouter();
+
+  // Fetch categories from the API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await fetch("/api/categories");
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.categories);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Update the selected category when the user selects/deselects a checkbox
+  const handleCategoryChange = (categoryId: number) => {
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
   };
 
+  // Handle condition checkbox (new, like new, used)
+  const handleConditionChange = (conditionType: string) => {
+    setCondition((prev) =>
+      prev.includes(conditionType)
+        ? prev.filter((c) => c !== conditionType)
+        : [...prev, conditionType]
+    );
+  };
+
+  // Trigger filter change
+  useEffect(() => {
+    const filters = {
+      categories: selectedCategories,
+      priceRange,
+      condition,
+      sellerUsername,
+    };
+    onFilterChange(filters);
+  }, [selectedCategories, priceRange, condition, sellerUsername]);
+
   return (
-    <div className="fixed left-0 top-16 w-64 bg-gray-100 h-full p-4 shadow-lg">
-      <h2 className="text-lg font-bold text-black">Categories</h2>
-      <ul className="mt-4">
-        <li>
-          <button
-            className={`w-full text-left py-2 px-4 rounded ${currentTab === 'Fashion' ? 'bg-gray-300' : ''} font-bold text-black`}
-            onClick={() => toggleDropdown('Fashion')}
-          >
-            Fashion
-          </button>
-          {openDropdown === 'Fashion' && (
-            <ul className="pl-8 mt-1"> {/* Increased padding-left for more prominent indentation */}
-              <li className="py-1 text-black">Cloths</li>
-              <li className="py-1 text-black">Shoes</li>
-              <li className="py-1 text-black">Jewelry</li>
-            </ul>
-          )}
-        </li>
-        <li>
-          <button
-            className={`w-full text-left py-2 px-4 rounded ${currentTab === 'Travel' ? 'bg-gray-300' : ''} font-bold text-black`}
-            onClick={() => toggleDropdown('Travel')}
-          >
-            Travel
-          </button>
-          {openDropdown === 'Travel' && (
-            <ul className="pl-8 mt-1"> {/* Indentation for Travel dropdown items */}
-              <li className="py-1 text-black">Destinations</li>
-              <li className="py-1 text-black">Packages</li>
-              <li className="py-1 text-black">Flights</li>
-            </ul>
-          )}
-        </li>
-        <li>
-          <button
-            className={`w-full text-left py-2 px-4 rounded ${currentTab === 'Entertainment' ? 'bg-gray-300' : ''} font-bold text-black`}
-            onClick={() => toggleDropdown('Entertainment')}
-          >
-            Entertainment
-          </button>
-          {openDropdown === 'Entertainment' && (
-            <ul className="pl-8 mt-1"> {/* Indentation for Entertainment dropdown items */}
-              <li className="py-1 text-black">Movies</li>
-              <li className="py-1 text-black">Music</li>
-              <li className="py-1 text-black">Games</li>
-            </ul>
-          )}
-        </li>
-      </ul>
+    <div className="w-60 bg-white shadow-lg p-4 fixed left-0 top-0 h-full">
+      {/* Category Filter */}
+      <h3 className="font-bold mb-2">Categories</h3>
+      {categories.map((category) => (
+        <div key={category.id} className="mb-2">
+          <input
+            type="checkbox"
+            id={`category-${category.id}`}
+            checked={selectedCategories.includes(category.id)}
+            onChange={() => handleCategoryChange(category.id)}
+          />
+          <label htmlFor={`category-${category.id}`} className="ml-2">
+            {category.name}
+          </label>
+        </div>
+      ))}
+
+      {/* Price Range Slider */}
+      <h3 className="font-bold mt-4 mb-2">Price Range</h3>
+      <Slider
+        value={priceRange}
+        onChange={(e, newValue) => setPriceRange(newValue as number[])}
+        valueLabelDisplay="auto"
+        min={0}
+        max={1000} // Adjust the range as needed
+      />
+      <p>
+        From: ${priceRange[0]} - To: ${priceRange[1]}
+      </p>
+
+      {/* Condition Filter */}
+      <h3 className="font-bold mt-4 mb-2">Condition</h3>
+      <div>
+        <input
+          type="checkbox"
+          id="condition-new"
+          checked={condition.includes("new")}
+          onChange={() => handleConditionChange("new")}
+        />
+        <label htmlFor="condition-new" className="ml-2">
+          New
+        </label>
+      </div>
+      <div>
+        <input
+          type="checkbox"
+          id="condition-used"
+          checked={condition.includes("used")}
+          onChange={() => handleConditionChange("used")}
+        />
+        <label htmlFor="condition-used" className="ml-2">
+          Used
+        </label>
+      </div>
+
+      {/* Seller Search */}
+      <h3 className="font-bold mt-4 mb-2">Seller</h3>
+      <input
+        type="text"
+        value={sellerUsername}
+        onChange={(e) => setSellerUsername(e.target.value)}
+        placeholder="Enter seller's username"
+        className="w-full border p-2 rounded"
+      />
     </div>
   );
-};
-
-export default Sidebar;
+}

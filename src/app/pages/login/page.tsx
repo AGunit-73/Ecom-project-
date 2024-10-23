@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // Correct import for Next.js 12 and earlier
 import { useEffect, useState } from "react";
 import { useUser } from "@/app/context/usercontext";
 

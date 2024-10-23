@@ -10,14 +10,25 @@ interface User {
   password: string; // Ensure this is included for password comparison.
 }
 
+// Define the Item type for item-related operations
+interface Item {
+  id: number;
+  sellerId: number;
+  title: string;
+  description: string;
+  price: number;
+  condition: string;
+  categoryId: number;
+  imageUrls: string[]; // Array to store multiple image URLs
+  postalInfo: string;
+  createdAt: string;
+}
+
 export default class ApiService {
-  /**
-   * Registers a new user.
-   * @param {string} username - The username of the new user.
-   * @param {string} email - The email of the new user.
-   * @param {string} password - The password of the new user.
-   * @returns {Promise<{ success: boolean; message: string; user?: User }>}
-   */
+  // ================================
+  // USER-RELATED METHODS
+  // ================================
+
   static async registerUser(
     username: string,
     email: string,
@@ -27,7 +38,6 @@ export default class ApiService {
       const encryptedEmail = encryptEmail(email);
       const hashedPassword = await hashPassword(password);
 
-      // SQL query to insert the user into the database.
       const result = await sql<User[]>`
         INSERT INTO users (username, email, password)
         VALUES (${username}, ${encryptedEmail}, ${hashedPassword})
@@ -43,62 +53,125 @@ export default class ApiService {
       };
     } catch (error) {
       console.error("Error during user registration:", error);
-
       return { success: false, message: "Error registering user" };
     }
   }
 
-  /**
-   * Authenticates a user with their username/email and password.
-   * @param {string} usernameOrEmail - The username or email of the user.
-   * @param {string} password - The password of the user.
-   * @returns {Promise<{ success: boolean; message: string; user?: User }>}
-   */
   static async authenticateUser(
     usernameOrEmail: string,
     password: string
   ): Promise<{ success: boolean; message: string; user?: User }> {
     try {
-      console.log("Received login data:", { usernameOrEmail, password });
       const encryptedEmail = encryptEmail(usernameOrEmail);
-      console.log("Encrypted email during login:", encryptedEmail);
-
-      // Retrieve user by username or encrypted email
       const result = await sql<User[]>`
         SELECT id, username, email, password FROM users
         WHERE username = ${usernameOrEmail} OR email = ${encryptedEmail};
       `;
 
-      console.log("Query result:", result);
-
-      // Log the rows directly before further processing
       if (result.rows.length === 0) {
-        console.log("No user found with the provided username or email.");
         return { success: false, message: "User not found" };
       }
 
       const user = result.rows[0];
-      console.log("User found:", user);
-
-      // Compare the provided password with the stored hashed password
       const isValidPassword = await comparePassword(password, user.password);
-      console.log("Is password valid?", isValidPassword);
 
       if (!isValidPassword) {
-        return {
-          success: false,
-          message: "Invalid password",
-        };
+        return { success: false, message: "Invalid password" };
       }
 
-      return {
-        success: true,
-        message: "User authenticated successfully",
-        user,
-      };
+      return { success: true, message: "User authenticated successfully", user };
     } catch (error) {
       console.error("Error during user authentication:", error);
       return { success: false, message: "Error during authentication" };
     }
   }
+
+  // ================================
+  // ITEM-RELATED METHODS
+  // ================================
+
+  static async uploadItem(itemData: {
+    sellerId: number;
+    title: string;
+    description: string;
+    price: number;
+    condition: string;
+    categoryId: number;
+    imageUrls: string[]; // Array of image URLs
+    postalInfo: string;
+  }): Promise<{ success: boolean; message: string }> {
+    try {
+      const { sellerId, title, description, price, condition, categoryId, imageUrls, postalInfo } = itemData;
+
+      await sql`
+        INSERT INTO items (seller_id, title, description, price, condition, category_id, image_urls, postal_info)
+        VALUES (${sellerId}, ${title}, ${description}, ${price}, ${condition}, ${categoryId}, ${imageUrls}, ${postalInfo});
+      `;
+
+      return { success: true, message: "Item uploaded successfully" };
+    } catch (error) {
+      console.error("Error uploading item:", error);
+      return { success: false, message: "Error uploading item" };
+    }
+  }
+
+  // Fetching items and categories methods remain unchanged...
+  static async fetchItems(
+    filters?: {
+      categories?: number[];
+      priceRange?: [number, number];
+      condition?: string[];
+      sellerUsername?: string;
+    }
+  ): Promise<{ success: boolean; items?: Item[]; message: string }> {
+    try {
+      let query = `
+        SELECT items.*, categories.name as category_name, users.username as seller_username
+        FROM items
+        JOIN categories ON items.category_id = categories.id
+        JOIN users ON items.seller_id = users.id
+        WHERE 1 = 1
+      `;
+
+      const params: any[] = [];
+
+      // Apply filters dynamically
+      if (filters) {
+        if (filters.categories?.length) {
+          query += ` AND items.category_id = ANY(${sql.array(filters.categories)})`;
+        }
+        if (filters.priceRange) {
+          query += ` AND items.price BETWEEN $${params.length + 1} AND $${params.length + 2}`;
+          params.push(filters.priceRange[0], filters.priceRange[1]);
+        }
+        if (filters.condition?.length) {
+          query += ` AND items.condition = ANY(${sql.array(filters.condition)})`;
+        }
+        if (filters.sellerUsername) {
+          query += ` AND users.username = $${params.length + 1}`;
+          params.push(filters.sellerUsername);
+        }
+      }
+
+      const result = await sql<Item[]>`${sql([query], ...params)}`;
+
+      return { success: true, items: result.rows, message: "Items fetched successfully" };
+    } catch (error) {
+      console.error("Error fetching items:", error);
+      return { success: false, message: "Error fetching items" };
+    }
+  }
+
+  // static async fetchCategories(): Promise<{ success: boolean; categories?: any[]; message: string }> {
+  //   try {
+  //     const result = await sql`
+  //       SELECT * FROM categories;
+  //     `;
+
+  //     return { success: true, categories: result.rows, message: "Categories fetched successfully" };
+  //   } catch (error) {
+  //     console.error("Error fetching categories:", error);
+  //     return { success: false, message: "Error fetching categories" };
+  //   }
+  // }
 }
