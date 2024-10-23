@@ -128,61 +128,24 @@ export default class ApiService {
     }
   }
   // Fetching items and categories methods remain unchanged...
-  static async fetchItems(
-    filters?: {
-      categories?: number[];
-      priceRange?: [number, number];
-      condition?: string[];
-      sellerUsername?: string;
-    }
-): Promise<{ success: boolean; items?: Item[]; message: string }> {
+  static async fetchItems(): Promise<{ success: boolean; items?: Item[]; message: string }> {
     try {
-        let query = `
-            SELECT items.*, categories.name as category_name, users.username as seller_username
-            FROM items
-            JOIN categories ON items.category_id = categories.id
-            JOIN users ON items.seller_id = users.id
-            WHERE 1 = 1
-        `;
-
-        const params: any[] = [];
-
-        // Apply filters dynamically
-        if (filters) {
-            if (filters.categories?.length) {
-                console.log("Applying category filters:", filters.categories);
-                query += ` AND items.category_id = ANY(${sql.array(filters.categories)})`;
-            }
-            if (filters.priceRange) {
-                console.log("Applying price range filter:", filters.priceRange);
-                query += ` AND items.price BETWEEN $${params.length + 1} AND $${params.length + 2}`;
-                params.push(filters.priceRange[0], filters.priceRange[1]);
-            }
-            if (filters.condition?.length) {
-                console.log("Applying condition filters:", filters.condition);
-                query += ` AND items.condition = ANY(${sql.array(filters.condition)})`;
-            }
-            if (filters.sellerUsername) {
-                console.log("Applying seller username filter:", filters.sellerUsername);
-                query += ` AND users.username = $${params.length + 1}`;
-                params.push(filters.sellerUsername);
-            }
-        }
-
-        // Log the constructed query and params for debugging
-        console.log("Constructed SQL Query:", query);
-        console.log("Parameters:", params);
-
-        const result = await sql<Item[]>`${sql([query], ...params)}`;
-        
-        console.log("Query Result:", result.rows); // Log the result of the query
-
-        return { success: true, items: result.rows, message: "Items fetched successfully" };
+      const result = await sql<Item[]>`
+        SELECT items.*, categories.name as category_name, users.username as seller_username
+        FROM items
+        JOIN categories ON items.category_id = categories.id
+        JOIN users ON items.seller_id = users.id;
+      `;
+  
+      console.log("Fetched items:", result.rows); // Log the result of the query
+  
+      return { success: true, items: result.rows, message: "Items fetched successfully" };
     } catch (error) {
-        console.error("Error fetching items:", error);
-        return { success: false, message: "Error fetching items" };
+      console.error("Error fetching items:", error);
+      return { success: false, message: "Error fetching items" };
     }
-}
+  }  
+  
 
   static async fetchCategories(): Promise<{ success: boolean; categories?: any[]; message: string }> {
     try {
