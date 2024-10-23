@@ -8,8 +8,8 @@ import { useEffect } from "react";
 import Header from "@/app/components/header"; // Import the Header component
 
 // Import Google Fonts
-const pacificoFont = {
-  fontFamily: "Pacifico, cursive",
+const helveticaFont = {
+  fontFamily: '"Neue Helvetica", Helvetica, Arial, sans-serif',
 };
 
 export default function LandingPage() {
@@ -87,7 +87,7 @@ export default function LandingPage() {
         {/* White Background on the Right Side */}
         <div className="w-1/2 bg-white flex flex-col items-center justify-start pt-32 p-8">
           {/* Isolora Text */}
-          <div className="text-[60px] font-bold text-black" style={{ fontFamily: "Pacifico, sans-serif" }}>
+          <div className="text-[60px] font-bold text-black" style={{ fontFamily: "Helvetica, Arial, sans-serif" }}>
             Isolora
           </div>
           {/* Search Bar */}
@@ -104,7 +104,7 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom Right Text */}
-          <div className="text-right mt-8" style={pacificoFont}>
+          <div className="text-right mt-8" style={helveticaFont}>
             <h2 className="text-[60px] text-black font-bold">
               &quot;Confidence in our sellers&quot;
             </h2>

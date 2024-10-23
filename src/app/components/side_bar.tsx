@@ -27,37 +27,7 @@ const Sidebar = ({ currentTab }) => {
               <li className="py-1 text-black">Jewelry</li>
             </ul>
           )}
-        </li>
-        <li>
-          <button
-            className={`w-full text-left py-2 px-4 rounded ${currentTab === 'Travel' ? 'bg-gray-300' : ''} font-bold text-black`}
-            onClick={() => toggleDropdown('Travel')}
-          >
-            Travel
-          </button>
-          {openDropdown === 'Travel' && (
-            <ul className="pl-8 mt-1"> {/* Indentation for Travel dropdown items */}
-              <li className="py-1 text-black">Destinations</li>
-              <li className="py-1 text-black">Packages</li>
-              <li className="py-1 text-black">Flights</li>
-            </ul>
-          )}
-        </li>
-        <li>
-          <button
-            className={`w-full text-left py-2 px-4 rounded ${currentTab === 'Entertainment' ? 'bg-gray-300' : ''} font-bold text-black`}
-            onClick={() => toggleDropdown('Entertainment')}
-          >
-            Entertainment
-          </button>
-          {openDropdown === 'Entertainment' && (
-            <ul className="pl-8 mt-1"> {/* Indentation for Entertainment dropdown items */}
-              <li className="py-1 text-black">Movies</li>
-              <li className="py-1 text-black">Music</li>
-              <li className="py-1 text-black">Games</li>
-            </ul>
-          )}
-        </li>
+        </li>        
       </ul>
     </div>
   );

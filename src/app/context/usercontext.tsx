@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 interface User {
   email: string;
+  name:string;
 }
 
 interface UserContextType {
