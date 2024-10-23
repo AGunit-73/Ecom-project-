@@ -1,6 +1,6 @@
 "use client"; // Mark this file as a Client Component
 
-import LandingPage from "./pages/fashion/page";
+import LandingPage from "./welcomPage";
 
 const IndexPage: React.FC = () => {
   return <LandingPage />;
