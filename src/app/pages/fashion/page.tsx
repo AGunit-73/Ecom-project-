@@ -25,7 +25,9 @@ export default function FashionPage() {
   // Function to fetch items based on filters
   const fetchItems = async (filters: any) => {
     try {
+      console.log("Fetching items with filters:", filters); // Log filters being passed
       const result = await ApiService.fetchItems(filters);
+      console.log("Result of fetch items:", result); // Log the result
       if (result.success) {
         setItems(result.items);
       } else {
@@ -111,26 +113,30 @@ export default function FashionPage() {
 
         {/* Display fetched items in a grid or list */}
         <div className="grid grid-cols-3 gap-4 mt-8">
-          {items.map((item) => (
-            <div key={item.id} className="border p-4 rounded-lg">
-              <Image
-                src={item.imageUrls[0]} // Use the first image URL
-                alt={item.title}
-                width={300}
-                height={300}
-                className="object-cover rounded-lg"
-              />
-              <h2 className="text-xl font-semibold mt-4">{item.title}</h2>
-              <p>{item.description}</p>
-              <p className="text-lg font-bold mt-2">${item.price}</p>
-              <button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={() => router.push(`/items/${item.id}`)} // Navigate to the item's details page
-              >
-                View Item
-              </button>
-            </div>
-          ))}
+          {items.length === 0 ? (
+            <p className="text-center text-gray-500">No items available</p>
+          ) : (
+            items.map((item) => (
+              <div key={item.id} className="border p-4 rounded-lg">
+                <Image
+                  src={item.image_urls ? item.image_urls[0] : "/images/placeholder.png"} // Add placeholder
+                  alt={item.title}
+                  width={300}
+                  height={300}
+                  className="object-cover rounded-lg"
+                />
+                <h2 className="text-xl font-semibold mt-4">{item.title}</h2>
+                <p>{item.description}</p>
+                <p className="text-lg font-bold mt-2">${item.price}</p>
+                <button
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={() => router.push(`/items/${item.id}`)} // Navigate to the item's details page
+                >
+                  View Item
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -103,9 +103,22 @@ export default class ApiService {
     try {
       const { sellerId, title, description, price, condition, categoryId, imageUrls, postalInfo } = itemData;
 
-      await sql`
+      // Convert the imageUrls array to PostgreSQL array format
+      const formattedImageUrls = `{${imageUrls.map(url => `"${url}"`).join(",")}}`;
+
+      const result = await sql`
         INSERT INTO items (seller_id, title, description, price, condition, category_id, image_urls, postal_info)
-        VALUES (${sellerId}, ${title}, ${description}, ${price}, ${condition}, ${categoryId}, ${imageUrls}, ${postalInfo});
+        VALUES (
+          ${sellerId}, 
+          ${title}, 
+          ${description}, 
+          ${price}, 
+          ${condition}, 
+          ${categoryId}, 
+          ${formattedImageUrls},  -- Manually format the image URLs as a PostgreSQL array
+          ${postalInfo}
+        )
+        RETURNING *;
       `;
 
       return { success: true, message: "Item uploaded successfully" };
@@ -114,7 +127,6 @@ export default class ApiService {
       return { success: false, message: "Error uploading item" };
     }
   }
-
   // Fetching items and categories methods remain unchanged...
   static async fetchItems(
     filters?: {
@@ -162,16 +174,16 @@ export default class ApiService {
     }
   }
 
-  // static async fetchCategories(): Promise<{ success: boolean; categories?: any[]; message: string }> {
-  //   try {
-  //     const result = await sql`
-  //       SELECT * FROM categories;
-  //     `;
+  static async fetchCategories(): Promise<{ success: boolean; categories?: any[]; message: string }> {
+    try {
+      const result = await sql`
+        SELECT * FROM categories;
+      `;
 
-  //     return { success: true, categories: result.rows, message: "Categories fetched successfully" };
-  //   } catch (error) {
-  //     console.error("Error fetching categories:", error);
-  //     return { success: false, message: "Error fetching categories" };
-  //   }
-  // }
+      return { success: true, categories: result.rows, message: "Categories fetched successfully" };
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      return { success: false, message: "Error fetching categories" };
+    }
+  }
 }

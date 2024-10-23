@@ -34,15 +34,15 @@ export default function SellPage() {
   ];
 
   const handleDrop = (acceptedFiles: File[]) => {
-    const newImageUrls = acceptedFiles.map(file => URL.createObjectURL(file));
-    setImageUrls(prev => [...prev, ...newImageUrls]);
+    const newImageUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
+    setImageUrls((prev) => [...prev, ...newImageUrls]);
   };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: handleDrop,
     accept: {
-      'image/*': [] // Accept only image files
-    }
+      "image/*": [], // Accept only image files
+    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

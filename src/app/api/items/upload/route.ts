@@ -1,29 +1,36 @@
 import { NextResponse } from 'next/server';
 import ApiService from '@/app/api_service/index';
-import { verifySessionToken } from '@/app/utils/session'; // Function to verify the session token
+import { verifySessionToken } from '@/app/utils/session'; // Ensure the session utility is correctly implemented
 
 export async function POST(request: Request) {
   try {
-    // Extract the session token from the request cookies
-    const sessionToken = request.headers.get('cookie')?.split('sessionToken=')[1];
+    // Extract and validate session token
+    const cookies = request.headers.get('cookie');
+    const sessionToken = cookies?.split(';').find(cookie => cookie.trim().startsWith('sessionToken='));
     
     if (!sessionToken) {
       return NextResponse.json({ success: false, message: 'No session token provided' }, { status: 401 });
     }
 
-    // Verify the session token and get the user
-    const user = await verifySessionToken(sessionToken); // Ensure this is async
+    const tokenValue = sessionToken.split('=')[1]; // Get the token value after 'sessionToken='
     
+    // Verify session token
+    const user = await verifySessionToken(tokenValue);
+
     if (!user) {
       return NextResponse.json({ success: false, message: 'Invalid or expired session token' }, { status: 401 });
     }
 
-    // Get the item data from the request body, including multiple image URLs
+    // Parse the request body
     const { title, description, price, condition, categoryId, imageUrls, postalInfo } = await request.json();
 
-    // Use the authenticated user's ID as the seller ID
+    if (!title || !description || !price || !condition || !categoryId || !postalInfo || !imageUrls.length) {
+      return NextResponse.json({ success: false, message: 'All fields are required' }, { status: 400 });
+    }
+
+    // Upload item using the API service
     const result = await ApiService.uploadItem({
-      sellerId: user.id, // Extract user ID from the session token
+      sellerId: user.id, // Seller ID from the session
       title,
       description,
       price,

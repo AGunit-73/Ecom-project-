@@ -25,7 +25,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
   // Fetch categories from the API
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await fetch("/api/categories");
+      const response = await fetch("/api/items/fetch_category");
       const data = await response.json();
       if (data.success) {
         setCategories(data.categories);
@@ -64,7 +64,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
   }, [selectedCategories, priceRange, condition, sellerUsername]);
 
   return (
-    <div className="w-60 bg-white shadow-lg p-4 fixed left-0 top-0 h-full">
+    <div className="w-60 bg-white shadow-lg p-4 fixed left-0 top-10 h-full"> {/* Add 'top-10' for padding */}
       {/* Category Filter */}
       <h3 className="font-bold mb-2">Categories</h3>
       {categories.map((category) => (

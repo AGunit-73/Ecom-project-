@@ -12,6 +12,7 @@ export default function Header() {
   const { user, setUser, logout } = useUser();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleLogout = async () => {
     try {
@@ -27,8 +28,14 @@ export default function Header() {
     }
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   useEffect(() => {
-    // This will ensure that the user state is set when the component mounts
     const fetchUser = async () => {
       try {
         const res = await fetch("/api/user/me");
@@ -57,29 +64,24 @@ export default function Header() {
         Isolora
       </button>
 
-      <nav className="flex space-x-8">
-        <button
-          onClick={() => router.push("/pages/fashion")}
-          className="text-white hover:text-pink-300 transition"
-          style={{ ...pacificoFont, fontSize: "24px" }}
-        >
-          Fashion
-        </button>
-        <button
-          onClick={() => router.push("/pages/travel")}
-          className="text-white hover:text-pink-300 transition"
-          style={{ ...pacificoFont, fontSize: "24px" }}
-        >
-          Travel
-        </button>
-        <button
-          onClick={() => router.push("/pages/entertainment")}
-          className="text-white hover:text-pink-300 transition"
-          style={{ ...pacificoFont, fontSize: "24px" }}
-        >
-          Entertainment
-        </button>
-      </nav>
+      {/* Search Bar */}
+      <form onSubmit={handleSearchSubmit} className="w-full max-w-lg mx-auto">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search for products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-3 rounded-full text-black focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="absolute right-2 top-2 bg-blue-500 text-white px-4 py-1 rounded-full"
+          >
+            Search
+          </button>
+        </div>
+      </form>
 
       <div className="relative">
         {user ? (
