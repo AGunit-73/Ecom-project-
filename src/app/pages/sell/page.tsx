@@ -54,21 +54,25 @@ export default function SellPage() {
       return;
     }
 
+    // Log the item data being uploaded
+    const itemData = {
+      title,
+      description,
+      price: parseFloat(price), // Ensure price is a number
+      condition,
+      categoryId,
+      imageUrls, // Submit array of image URLs
+      postalInfo,
+    };
+    console.log("Item data to be uploaded:", itemData);
+
     try {
       const res = await fetch("/api/items/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title,
-          description,
-          price: parseFloat(price), // Ensure price is a number
-          condition,
-          categoryId,
-          imageUrls, // Submit array of image URLs
-          postalInfo,
-        }),
+        body: JSON.stringify(itemData),
       });
 
       const data = await res.json();

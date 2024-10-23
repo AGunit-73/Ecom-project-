@@ -19,6 +19,13 @@ export async function GET(request: Request) {
       ? priceRange.split(",").map(Number) as [number, number]
       : [0, 1000]; // Default range
 
+    console.log("Fetching items with filters:", {
+      categories: parsedCategories,
+      priceRange: parsedPriceRange,
+      condition: parsedCondition,
+      sellerUsername: sellerUsername || undefined,
+    });
+
     // Fetch items using the API service with the filters
     const result = await ApiService.fetchItems({
       categories: parsedCategories,
@@ -26,6 +33,8 @@ export async function GET(request: Request) {
       condition: parsedCondition,
       sellerUsername: sellerUsername || undefined,
     });
+
+    console.log("Fetch result:", result);
 
     // Check and return the result
     if (result.success) {

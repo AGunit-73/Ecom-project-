@@ -25,11 +25,11 @@ export default function FashionPage() {
   // Function to fetch items based on filters
   const fetchItems = async (filters: any) => {
     try {
-      console.log("Fetching items with filters:", filters); // Log filters being passed
       const result = await ApiService.fetchItems(filters);
-      console.log("Result of fetch items:", result); // Log the result
+      console.log("Fetched items:", result); // Log the fetched items for debugging
       if (result.success) {
         setItems(result.items);
+        console.log("Items state updated:", result.items); // Check the updated items state
       } else {
         console.error(result.message);
       }
@@ -114,12 +114,12 @@ export default function FashionPage() {
         {/* Display fetched items in a grid or list */}
         <div className="grid grid-cols-3 gap-4 mt-8">
           {items.length === 0 ? (
-            <p className="text-center text-gray-500">No items available</p>
+            <p className="col-span-3 text-center">No items available</p> // Display message if no items are found
           ) : (
             items.map((item) => (
               <div key={item.id} className="border p-4 rounded-lg">
                 <Image
-                  src={item.image_urls ? item.image_urls[0] : "/images/placeholder.png"} // Add placeholder
+                  src={item.imageUrls[0]} // Use the first image URL
                   alt={item.title}
                   width={300}
                   height={300}
