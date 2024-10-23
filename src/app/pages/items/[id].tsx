@@ -12,27 +12,27 @@ interface Item {
 
 export default function ItemPage() {
   const router = useRouter();
-  const { id } = router.query; // Capturing the dynamic id from the URL
+  const { id } = router.query;
 
+  // Type the item state as Item or null
   const [item, setItem] = useState<Item | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Page mounted, item ID:", id); // Log the item ID from the URL
+    console.log("Page mounted, item ID from query:", id);
 
     if (id) {
-      // Fetch item data based on the id
       const fetchItem = async () => {
         console.log(`Fetching item with ID: ${id}`);
         try {
-          const res = await fetch(`/api/items/fetch_id/${id}`); // Call the correct API route for fetching item by id
+          const res = await fetch(`/api/items/fetch_id/${id}`);
           if (!res.ok) {
             throw new Error(`Failed to fetch item. Status code: ${res.status}`);
           }
 
           const data = await res.json();
-          console.log("Fetch result:", data); // Log the result from the API
+          console.log("Fetch result:", data);
 
           if (data.success) {
             setItem(data.item);
@@ -54,27 +54,21 @@ export default function ItemPage() {
   }, [id]);
 
   if (loading) {
-    console.log("Loading state..."); // Log loading state
     return <p>Loading...</p>;
   }
 
   if (error) {
-    console.log("Error occurred:", error); // Log if there’s an error
     return <p>{error}</p>;
   }
 
   if (!item) {
-    console.log("No item found."); // Log if no item found
     return <p>Item not found</p>;
   }
 
   return (
     <div className="container mx-auto p-4">
       <button
-        onClick={() => {
-          console.log("Going back to previous page");
-          router.back();
-        }}
+        onClick={() => router.back()}
         className="mb-4 text-blue-600 underline"
       >
         Back
