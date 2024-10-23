@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/router"; // Correct import for Next.js 12 and earlier
+import { useRouter } from "next/navigation"; // Correct import for Next.js 12 and earlier
 import { useEffect, useState } from "react";
 import Header from "@/app/components/header";
 import Sidebar from "@/app/components/side_bar";

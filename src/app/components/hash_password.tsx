@@ -1,12 +1,14 @@
-import argon2 from "argon2";
+// src/app/components/hash_password.tsx
 
+// Temporarily disable hashing
 export const hashPassword = async (password: string): Promise<string> => {
-  return await argon2.hash(password);
+  return password; // Return the plain password for now
 };
 
+// Temporarily disable hash comparison
 export const comparePassword = async (
   inputPassword: string,
   storedHash: string
 ): Promise<boolean> => {
-  return await argon2.verify(storedHash, inputPassword);
+  return inputPassword === storedHash; // Compare plain passwords
 };
