@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Header from "@/app/components/header";
 import Image from "next/image";
-import Link from "next/link";
+
 
 // Define the Item interface to match the structure of the items
 interface Item {
