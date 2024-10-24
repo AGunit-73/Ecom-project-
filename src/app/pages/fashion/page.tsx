@@ -68,11 +68,7 @@ export default function FashionPage() {
                 <h2 className="text-xl font-semibold mt-4">{item.title}</h2>
                 <p className="text-lg font-bold mt-2">${item.price}</p>
                 {/* Use Next.js Link for navigation */}
-                <Link href={`/items/${item.id}`} passHref>
-                  <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-                    View Item
-                  </button>
-                </Link>
+                
               </div>
             ))
           )}
