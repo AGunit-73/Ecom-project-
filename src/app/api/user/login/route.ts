@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     const result = await ApiService.authenticateUser(usernameOrEmail, password);
 
-    if (result.success) {
+    if (result.success && result.user) { // Ensure result.user is defined
       // Generate a session token (could be a JWT or random token)
       const sessionToken = createSessionToken(result.user); // Pass user data to the session token creator
 

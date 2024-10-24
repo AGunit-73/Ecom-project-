@@ -1,5 +1,3 @@
-// src/app/api/test_connection.ts
-
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
@@ -13,6 +11,13 @@ export async function GET() {
     } catch (error) {
         // If there's an error, log it and return a failure response
         console.error("Connection failed:", error);
-        return NextResponse.json({ success: false, message: "Connection failed: " + error.message }, { status: 500 });
+
+        // Safely handle the error as an instance of Error
+        let errorMessage = "An unknown error occurred";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return NextResponse.json({ success: false, message: "Connection failed: " + errorMessage }, { status: 500 });
     }
 }

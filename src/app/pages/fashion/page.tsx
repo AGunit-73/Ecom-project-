@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Header from "@/app/components/header";
-import Sidebar from "@/app/components/side_bar";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -45,8 +44,7 @@ export default function FashionPage() {
       {/* Include the Header */}
       <Header />
 
-      {/* Sidebar */}
-      <Sidebar currentTab="Fashion" onFilterChange={fetchItems} />
+      {/* Sidebar has been removed */}
 
       <div className="pt-4 pl-72">
         <h1 className="text-3xl font-bold text-center mt-8">

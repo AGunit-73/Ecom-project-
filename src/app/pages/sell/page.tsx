@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation"; // Correct import for Next.js 12 and earlier
 import { useUser } from "@/app/context/usercontext";
 import { useDropzone } from "react-dropzone"; // Importing useDropzone from react-dropzone
+import Image from "next/image"; // Use Next.js Image for better optimization
 
 interface Category {
   id: number;
@@ -174,9 +175,12 @@ export default function SellPage() {
         </div>
 
         {/* Drag and Drop Area for Image Upload */}
-        <div {...getRootProps()} className="border-dashed border-2 border-gray-400 p-4 rounded mb-4 text-center">
+        <div
+          {...getRootProps()}
+          className="border-dashed border-2 border-gray-400 p-4 rounded mb-4 text-center"
+        >
           <input {...getInputProps()} />
-          <p>Drag 'n' drop some files here, or click to select files</p>
+          <p>Drag &apos;n&apos; drop some files here, or click to select files</p>
           <p className="text-gray-500">Accepted formats: jpg, png, gif</p>
         </div>
 
@@ -184,7 +188,14 @@ export default function SellPage() {
         {imageUrls.length > 0 && (
           <div className="flex space-x-2">
             {imageUrls.map((imageUrl, index) => (
-              <img key={index} src={imageUrl} alt={`Uploaded preview ${index}`} className="w-20 h-20 object-cover rounded" />
+              <Image
+                key={index}
+                src={imageUrl}
+                alt={`Uploaded preview ${index}`}
+                width={80} // Set appropriate width
+                height={80} // Set appropriate height
+                className="object-cover rounded-lg"
+              />
             ))}
           </div>
         )}

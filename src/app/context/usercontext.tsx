@@ -3,8 +3,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface User {
+  id: number;
   username: string;
   email: string;
+  password: string;
 }
 
 interface UserContextType {

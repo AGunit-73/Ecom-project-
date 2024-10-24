@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import FashionPage from '@/app/welcomPage';
+import FashionPage from '@/app/pages/fashion/page';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
